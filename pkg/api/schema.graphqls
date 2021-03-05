@@ -1,0 +1,53 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+# define the schema
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+type Mutation {
+  createAudioShort(input: AudioShortInput!): AudioShort
+  updateAudioShort(id: ID!, input: AudioShortInput!): AudioShort
+  deleteAudioShort(id: ID!): AudioShort
+}
+
+type Query {
+  getAudioShorts(page: Int = 0, limit: Int = 0): [AudioShort!]
+  getAudioShort(id: ID!): AudioShort
+}
+
+input AudioShortInput {
+  title: String!
+  description: String!
+  category: Category!
+  audio_file: String!
+  creator: CreatorInput!
+}
+
+type AudioShort {
+  id: ID!
+  title: String!
+  description: String!
+  category: Category!
+  audio_file: String!
+  creator: Creator!
+}
+
+type Creator {
+  name: String!
+  email: String!
+}
+
+input CreatorInput {
+  id: ID!
+}
+
+enum Category {
+  news
+  gossip
+  review
+  story
+}
