@@ -20,7 +20,7 @@ func findOneByID(ctx context.Context, tx *sql.Tx, id string) (short *model.Audio
 		"a.description, " +
 		"a.category, " +
 		"a.audio_file, " +
-		"c.username, " +
+		"c.name, " +
 		"c.email " +
 		"FROM audio_shorts AS a," +
 		"creators AS c " +
@@ -60,7 +60,7 @@ func findOneByUnique(ctx context.Context, tx *sql.Tx, inputTitle string, creator
 		"a.description, " +
 		"a.category, " +
 		"a.audio_file, " +
-		"c.username, " +
+		"c.name, " +
 		"c.email " +
 		"FROM audio_shorts AS a," +
 		"creators AS c " +
@@ -86,7 +86,7 @@ func findOneByUnique(ctx context.Context, tx *sql.Tx, inputTitle string, creator
 }
 
 func findAll(ctx context.Context, tx *sql.Tx, page, limit uint16) (shorts []*model.AudioShort, err error) {
-	shorts = make([]*model.AudioShort, limit)
+	shorts = make([]*model.AudioShort, 0, limit) // set cap at limit
 	var (
 		id          string
 		title       string
@@ -102,7 +102,7 @@ func findAll(ctx context.Context, tx *sql.Tx, page, limit uint16) (shorts []*mod
 		"a.description, " +
 		"a.category, " +
 		"a.audio_file, " +
-		"c.username, " +
+		"c.name, " +
 		"c.email " +
 		"FROM audio_shorts AS a," +
 		"creators AS c " +
@@ -118,7 +118,7 @@ func findAll(ctx context.Context, tx *sql.Tx, page, limit uint16) (shorts []*mod
 	}
 	defer rows.Close()
 
-	for i := 0; rows.Next(); i++ {
+	for rows.Next() {
 		err = rows.Scan(&id, &title, &description, &category, &audioFile, &name, &email)
 		if err != nil {
 			return nil, err
@@ -134,7 +134,7 @@ func findAll(ctx context.Context, tx *sql.Tx, page, limit uint16) (shorts []*mod
 				Email: email,
 			},
 		}
-		shorts[i] = short
+		shorts = append(shorts, short)
 	}
 	return
 }
