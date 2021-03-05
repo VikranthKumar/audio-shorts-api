@@ -3,11 +3,11 @@ package store
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"sync"
 
 	"github.com/nooble/task/audio-short-api/pkg/api/model"
 	"github.com/nooble/task/audio-short-api/pkg/logging"
+	"github.com/pkg/errors"
 )
 
 type (
@@ -37,7 +37,7 @@ func (s *shortsStore) GetByID(ctx context.Context, id string) (short *model.Audi
 
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
-		return nil, errors.New("cannot start transaction")
+		return nil, errors.Wrap(err, ErrorMessageTransactionFailed)
 	}
 
 	defer func() {
@@ -45,20 +45,19 @@ func (s *shortsStore) GetByID(ctx context.Context, id string) (short *model.Audi
 		if err != nil {
 			err := tx.Rollback()
 			if err != nil {
-				logging.WithContext(ctx).Error("failed to rollback")
+				logging.WithContext(ctx).Error(ErrorMessageRollbackFailed)
 			}
 		}
 	}()
 
 	short, err = findOneByID(ctx, tx, id)
 	if err != nil {
-		return nil, errors.New("cannot find audio short with ID " + id)
+		return nil, errors.Wrap(err, ErrorMessageFindFailed+" ID:"+id)
 	}
-	logging.WithContext(ctx).Debug(short.Title)
 
 	err = tx.Commit()
 	if err != nil {
-		return nil, errors.New("cannot commit transaction")
+		return nil, errors.Wrap(err, ErrorMessageCommitFailed)
 	}
 	return
 }
@@ -69,7 +68,7 @@ func (s *shortsStore) GetAll(ctx context.Context, page, limit uint16) (shorts []
 
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
-		return nil, errors.New("cannot start transaction")
+		return nil, errors.Wrap(err, ErrorMessageTransactionFailed)
 	}
 
 	defer func() {
@@ -77,19 +76,19 @@ func (s *shortsStore) GetAll(ctx context.Context, page, limit uint16) (shorts []
 		if err != nil {
 			err := tx.Rollback()
 			if err != nil {
-				logging.WithContext(ctx).Error("failed to rollback")
+				logging.WithContext(ctx).Error(ErrorMessageRollbackFailed)
 			}
 		}
 	}()
 
 	shorts, err = findAll(ctx, tx, page, limit)
 	if err != nil {
-		return nil, errors.New("failed to find audio shorts")
+		return nil, errors.Wrap(err, ErrorMessageFindFailed)
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		return nil, errors.New("cannot commit transaction")
+		return nil, errors.Wrap(err, ErrorMessageCommitFailed)
 	}
 	return
 }
@@ -100,32 +99,31 @@ func (s *shortsStore) Create(ctx context.Context, input *model.AudioShortInput) 
 
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
-		return nil, errors.New("cannot start transaction")
+		return nil, errors.Wrap(err, ErrorMessageTransactionFailed)
 	}
 
 	defer func() {
 		// evaluated when function returns
 		if err != nil {
-			logging.WithContext(ctx).Error(err.Error())
 			err := tx.Rollback()
 			if err != nil {
-				logging.WithContext(ctx).Error("failed to rollback")
+				logging.WithContext(ctx).Error(ErrorMessageRollbackFailed)
 			}
 		}
 	}()
 
 	err = createOne(ctx, tx, input)
 	if err != nil {
-		return nil, errors.New("failed to create audio short")
+		return nil, errors.Wrap(err, ErrorMessageCreateFailed)
 	}
 	short, err = findOneByUnique(ctx, tx, input.Title, input.Creator.ID)
 	if err != nil {
-		return nil, errors.New("cannot find audio short with ID ")
+		return nil, errors.Wrap(err, ErrorMessageFindFailed)
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		return nil, errors.New("cannot commit transaction")
+		return nil, errors.Wrap(err, ErrorMessageCommitFailed)
 	}
 	return
 }
@@ -136,32 +134,31 @@ func (s *shortsStore) Update(ctx context.Context, id string, input *model.AudioS
 
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
-		return nil, errors.New("cannot start transaction")
+		return nil, errors.Wrap(err, ErrorMessageTransactionFailed)
 	}
 
 	defer func() {
 		// evaluated when function returns
 		if err != nil {
-			logging.WithContext(ctx).Error(err.Error())
 			err := tx.Rollback()
 			if err != nil {
-				logging.WithContext(ctx).Error("failed to rollback")
+				logging.WithContext(ctx).Error(ErrorMessageRollbackFailed)
 			}
 		}
 	}()
 
 	err = updateOne(ctx, tx, id, input)
 	if err != nil {
-		return nil, errors.New("failed to update audio short")
+		return nil, errors.Wrap(err, ErrorMessageUpdateFailed+" ID:"+id)
 	}
 	short, err = findOneByID(ctx, tx, id)
 	if err != nil {
-		return nil, errors.New("cannot find audio short with ID " + id)
+		return nil, errors.Wrap(err, ErrorMessageFindFailed+" ID:"+id)
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		return nil, errors.New("cannot commit transaction")
+		return nil, errors.Wrap(err, ErrorMessageCommitFailed)
 	}
 	return
 }
@@ -173,7 +170,7 @@ func (s *shortsStore) Delete(ctx context.Context, id string) (short *model.Audio
 	short = &model.AudioShort{}
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
-		return nil, errors.New("cannot start transaction")
+		return nil, errors.Wrap(err, ErrorMessageTransactionFailed)
 	}
 
 	defer func() {
@@ -181,23 +178,23 @@ func (s *shortsStore) Delete(ctx context.Context, id string) (short *model.Audio
 		if err != nil {
 			err := tx.Rollback()
 			if err != nil {
-				logging.WithContext(ctx).Error("failed to rollback")
+				logging.WithContext(ctx).Error(ErrorMessageRollbackFailed)
 			}
 		}
 	}()
 
 	short, err = findOneByID(ctx, tx, id)
 	if err != nil {
-		return nil, errors.New("cannot find audio short with ID " + id)
+		return nil, errors.Wrap(err, ErrorMessageFindFailed+" ID:"+id)
 	}
 	err = deleteOne(ctx, tx, id)
 	if err != nil {
-		return nil, errors.New("failed to delete with ID " + id)
+		return nil, errors.Wrap(err, ErrorMessageDeleteFailed+" ID:"+id)
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		return nil, errors.New("cannot commit transaction")
+		return nil, errors.Wrap(err, ErrorMessageCommitFailed)
 	}
 	return
 }
