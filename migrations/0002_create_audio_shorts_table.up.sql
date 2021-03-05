@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS audio_shorts (
     "creator_id" int NOT NULL,
     "created_at" timestamp with time zone DEFAULT now(),
     "updated_at" timestamp with time zone DEFAULT now(),
+    UNIQUE ("title", "creator_id"),
     CONSTRAINT fk_creator FOREIGN KEY("creator_id") references creators("id")
 );
 
