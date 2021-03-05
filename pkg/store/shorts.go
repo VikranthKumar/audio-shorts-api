@@ -10,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+//go:generate mockgen -source=shorts.go -destination=shorts_mock.go -package=store AudioShortsStore
 type (
 	AudioShortsStore interface {
 		GetByID(ctx context.Context, id string) (short *model.AudioShort, err error)
