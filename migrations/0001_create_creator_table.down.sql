@@ -1,0 +1,6 @@
+BEGIN;
+
+DROP TABLE IF EXISTS creators;
+DROP TYPE IF EXISTS creator_status;
+
+COMMIT;
