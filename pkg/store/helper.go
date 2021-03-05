@@ -27,7 +27,7 @@ func findOneByID(ctx context.Context, tx *sql.Tx, id string) (short *model.Audio
 		"WHERE " +
 		"c.id = a.creator_id " +
 		"AND a.id = $1 " +
-		"AND status != deleted"
+		"AND a.status != 'deleted'"
 
 	row := tx.QueryRowContext(ctx, query, id)
 	err = row.Scan(&title, &description, &category, &audioFile, &name, &email)
@@ -69,7 +69,7 @@ func findOneByUnique(ctx context.Context, tx *sql.Tx, inputTitle string, creator
 		"c.id = a.creator_id " +
 		"AND a.title = $1 " +
 		"AND a.creator_id = $2 " +
-		"AND status != deleted"
+		"AND a.status != 'deleted'"
 
 	row := tx.QueryRowContext(ctx, query, inputTitle, creatorID)
 	err = row.Scan(&id, &title, &description, &category, &audioFile, &name, &email)
@@ -110,7 +110,7 @@ func findAll(ctx context.Context, tx *sql.Tx, page, limit uint16) (shorts []*mod
 		"creators AS c " +
 		"WHERE " +
 		"c.id = a.creator_id " +
-		"AND status != deleted " +
+		"AND a.status != 'deleted' " +
 		"ORDER BY a.id ASC " +
 		"LIMIT $1 " +
 		"OFFSET $2"
@@ -119,7 +119,9 @@ func findAll(ctx context.Context, tx *sql.Tx, page, limit uint16) (shorts []*mod
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() {
+		err = rows.Close()
+	}()
 
 	for rows.Next() {
 		err = rows.Scan(&id, &title, &description, &category, &audioFile, &name, &email)

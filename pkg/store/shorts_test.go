@@ -27,7 +27,7 @@ func TestShortsStore_GetByID(t *testing.T) {
 
 	sqlMock.ExpectBegin()
 	sqlMock.ExpectQuery(
-		regexp.QuoteMeta("SELECT a.title, a.description, a.category, a.audio_file, c.name, c.email FROM audio_shorts AS a,creators AS c WHERE c.id = a.creator_id AND a.id = $1 AND status != deleted")).
+		regexp.QuoteMeta("SELECT a.title, a.description, a.category, a.audio_file, c.name, c.email FROM audio_shorts AS a,creators AS c WHERE c.id = a.creator_id AND a.id = $1 AND a.status != 'deleted'")).
 		WithArgs(ID).
 		WillReturnRows(sqlmock.NewRows([]string{"title", "description", "category", "audio_file", "username", "email"}).
 			AddRow(title, description, category, audioFile, name, email))
@@ -60,7 +60,7 @@ func TestShortsStore_GetAll(t *testing.T) {
 
 	sqlMock.ExpectBegin()
 	sqlMock.ExpectQuery(
-		regexp.QuoteMeta("SELECT a.id, a.title, a.description, a.category, a.audio_file, c.name, c.email FROM audio_shorts AS a,creators AS c WHERE c.id = a.creator_id AND status != deleted ORDER BY a.id ASC LIMIT $1 OFFSET $2")).
+		regexp.QuoteMeta("SELECT a.id, a.title, a.description, a.category, a.audio_file, c.name, c.email FROM audio_shorts AS a,creators AS c WHERE c.id = a.creator_id AND a.status != 'deleted' ORDER BY a.id ASC LIMIT $1 OFFSET $2")).
 		WithArgs(1, 0).
 		WillReturnRows(sqlmock.NewRows([]string{"id", "title", "description", "category", "audio_file", "username", "email"}).
 			AddRow(ID, title, description, category, audioFile, name, email))
@@ -108,7 +108,7 @@ func TestShortsStore_Create(t *testing.T) {
 		WithArgs(title, description, status, category, audioFile, creatorID).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	sqlMock.ExpectQuery(
-		regexp.QuoteMeta("SELECT a.id, a.title, a.description, a.category, a.audio_file, c.name, c.email FROM audio_shorts AS a,creators AS c WHERE c.id = a.creator_id AND a.title = $1 AND a.creator_id = $2 AND status != deleted")).
+		regexp.QuoteMeta("SELECT a.id, a.title, a.description, a.category, a.audio_file, c.name, c.email FROM audio_shorts AS a,creators AS c WHERE c.id = a.creator_id AND a.title = $1 AND a.creator_id = $2 AND a.status != 'deleted'")).
 		WithArgs(title, creatorID).
 		WillReturnRows(sqlmock.NewRows([]string{"id", "title", "description", "category", "audio_file", "name", "email"}).
 			AddRow(ID, title, description, category, audioFile, name, email))
@@ -154,7 +154,7 @@ func TestShortsStore_Update(t *testing.T) {
 		WithArgs(title, description, category, audioFile, creatorID, ID).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	sqlMock.ExpectQuery(
-		regexp.QuoteMeta("SELECT a.title, a.description, a.category, a.audio_file, c.name, c.email FROM audio_shorts AS a,creators AS c WHERE c.id = a.creator_id AND a.id = $1 AND status != deleted")).
+		regexp.QuoteMeta("SELECT a.title, a.description, a.category, a.audio_file, c.name, c.email FROM audio_shorts AS a,creators AS c WHERE c.id = a.creator_id AND a.id = $1 AND a.status != 'deleted'")).
 		WithArgs(ID).
 		WillReturnRows(sqlmock.NewRows([]string{"title", "description", "category", "audio_file", "name", "email"}).
 			AddRow(title, description, category, audioFile, name, email))
@@ -188,7 +188,7 @@ func TestShortsStore_Delete(t *testing.T) {
 
 	sqlMock.ExpectBegin()
 	sqlMock.ExpectQuery(
-		regexp.QuoteMeta("SELECT a.title, a.description, a.category, a.audio_file, c.name, c.email FROM audio_shorts AS a,creators AS c WHERE c.id = a.creator_id AND a.id = $1 AND status != deleted")).
+		regexp.QuoteMeta("SELECT a.title, a.description, a.category, a.audio_file, c.name, c.email FROM audio_shorts AS a,creators AS c WHERE c.id = a.creator_id AND a.id = $1 AND a.status != 'deleted'")).
 		WithArgs(ID).
 		WillReturnRows(sqlmock.NewRows([]string{"title", "description", "category", "audio_file", "name", "email"}).
 			AddRow(title, description, category, audioFile, name, email))
@@ -225,7 +225,7 @@ func TestShortsStore_HardDelete(t *testing.T) {
 
 	sqlMock.ExpectBegin()
 	sqlMock.ExpectQuery(
-		regexp.QuoteMeta("SELECT a.title, a.description, a.category, a.audio_file, c.name, c.email FROM audio_shorts AS a,creators AS c WHERE c.id = a.creator_id AND a.id = $1 AND status != deleted")).
+		regexp.QuoteMeta("SELECT a.title, a.description, a.category, a.audio_file, c.name, c.email FROM audio_shorts AS a,creators AS c WHERE c.id = a.creator_id AND a.id = $1 AND a.status != 'deleted'")).
 		WithArgs(ID).
 		WillReturnRows(sqlmock.NewRows([]string{"title", "description", "category", "audio_file", "name", "email"}).
 			AddRow(title, description, category, audioFile, name, email))
