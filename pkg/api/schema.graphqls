@@ -12,6 +12,7 @@ type Mutation {
   createAudioShort(input: AudioShortInput!): AudioShort
   updateAudioShort(id: ID!, input: AudioShortInput!): AudioShort
   deleteAudioShort(id: ID!): AudioShort
+  hardDeleteAudioShort(id: ID!): AudioShort
 }
 
 type Query {
@@ -50,4 +51,10 @@ enum Category {
   gossip
   review
   story
+}
+
+enum Status {
+  active
+  banned
+  deleted
 }

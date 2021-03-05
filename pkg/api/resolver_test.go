@@ -91,32 +91,3 @@ func TestResolver_Mutation(t *testing.T) {
 	assert.Equal(t, "abc", resp.UpdateAudioShort.Title)
 	assert.Equal(t, "abcs", resp.UpdateAudioShort.Description)
 }
-
-//mutation {
-//deleteAudioShort(id:9) {
-//id
-//}
-//createAudioShort(input: {
-//title:"new",
-//description:"this is new",
-//category:gossip,
-//audio_file:"https://1234.com",
-//creator: {
-//id:1
-//}
-//}) {
-//id
-//}
-//
-//updateAudioShort(id:1, input:{
-//title:"a",
-//description:"this is new",
-//category:gossip,
-//audio_file:"https://1234.com",
-//creator: {
-//id:2
-//}
-//}) {
-//id
-//}
-//

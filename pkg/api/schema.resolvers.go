@@ -45,6 +45,17 @@ func (r *mutationResolver) DeleteAudioShort(ctx context.Context, id string) (*mo
 	return short, nil
 }
 
+func (r *mutationResolver) HardDeleteAudioShort(ctx context.Context, id string) (*model.AudioShort, error) {
+	ctx = logging.NewContext(ctx)
+	logging.WithContext(ctx).Info("Hard Delete Audio Short with id " + id)
+	short, err := r.store.HardDelete(ctx, id)
+	if err != nil {
+		logging.WithContext(ctx).Error(errors.Wrap(err, ErrorMessageHardDeleteFailed).Error())
+		return nil, errors.New(ErrorMessageHardDeleteFailed)
+	}
+	return short, nil
+}
+
 func (r *queryResolver) GetAudioShorts(ctx context.Context, page *int, limit *int) ([]*model.AudioShort, error) {
 	ctx = logging.NewContext(ctx)
 	logging.WithContext(ctx).Info("Get Audio Shorts")

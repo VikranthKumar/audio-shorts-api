@@ -18,6 +18,7 @@ type (
 		Create(ctx context.Context, input *model.AudioShortInput) (short *model.AudioShort, err error)
 		Update(ctx context.Context, id string, input *model.AudioShortInput) (short *model.AudioShort, err error)
 		Delete(ctx context.Context, id string) (short *model.AudioShort, err error)
+		HardDelete(ctx context.Context, id string) (short *model.AudioShort, err error)
 	}
 
 	shortsStore struct {
@@ -188,7 +189,43 @@ func (s *shortsStore) Delete(ctx context.Context, id string) (short *model.Audio
 	if err != nil {
 		return nil, errors.Wrap(err, ErrorMessageFindFailed+" ID:"+id)
 	}
-	err = deleteOne(ctx, tx, id)
+	err = softDeleteOne(ctx, tx, id)
+	if err != nil {
+		return nil, errors.Wrap(err, ErrorMessageDeleteFailed+" ID:"+id)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, errors.Wrap(err, ErrorMessageCommitFailed)
+	}
+	return
+}
+
+func (s *shortsStore) HardDelete(ctx context.Context, id string) (short *model.AudioShort, err error) {
+	s.Lock()
+	defer s.Unlock()
+
+	short = &model.AudioShort{}
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, errors.Wrap(err, ErrorMessageTransactionFailed)
+	}
+
+	defer func() {
+		// evaluated when function returns
+		if err != nil {
+			err := tx.Rollback()
+			if err != nil {
+				logging.WithContext(ctx).Error(ErrorMessageRollbackFailed)
+			}
+		}
+	}()
+
+	short, err = findOneByID(ctx, tx, id)
+	if err != nil {
+		return nil, errors.Wrap(err, ErrorMessageFindFailed+" ID:"+id)
+	}
+	err = hardDeleteOne(ctx, tx, id)
 	if err != nil {
 		return nil, errors.Wrap(err, ErrorMessageDeleteFailed+" ID:"+id)
 	}

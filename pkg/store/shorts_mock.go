@@ -95,6 +95,21 @@ func (mr *MockAudioShortsStoreMockRecorder) GetByID(ctx, id interface{}) *gomock
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockAudioShortsStore)(nil).GetByID), ctx, id)
 }
 
+// HardDelete mocks base method.
+func (m *MockAudioShortsStore) HardDelete(ctx context.Context, id string) (*model.AudioShort, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HardDelete", ctx, id)
+	ret0, _ := ret[0].(*model.AudioShort)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HardDelete indicates an expected call of HardDelete.
+func (mr *MockAudioShortsStoreMockRecorder) HardDelete(ctx, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HardDelete", reflect.TypeOf((*MockAudioShortsStore)(nil).HardDelete), ctx, id)
+}
+
 // Update mocks base method.
 func (m *MockAudioShortsStore) Update(ctx context.Context, id string, input *model.AudioShortInput) (*model.AudioShort, error) {
 	m.ctrl.T.Helper()

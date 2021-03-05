@@ -26,7 +26,8 @@ func findOneByID(ctx context.Context, tx *sql.Tx, id string) (short *model.Audio
 		"creators AS c " +
 		"WHERE " +
 		"c.id = a.creator_id " +
-		"AND a.id = $1"
+		"AND a.id = $1 " +
+		"AND status != deleted"
 
 	row := tx.QueryRowContext(ctx, query, id)
 	err = row.Scan(&title, &description, &category, &audioFile, &name, &email)
@@ -67,7 +68,8 @@ func findOneByUnique(ctx context.Context, tx *sql.Tx, inputTitle string, creator
 		"WHERE " +
 		"c.id = a.creator_id " +
 		"AND a.title = $1 " +
-		"AND a.creator_id = $2"
+		"AND a.creator_id = $2 " +
+		"AND status != deleted"
 
 	row := tx.QueryRowContext(ctx, query, inputTitle, creatorID)
 	err = row.Scan(&id, &title, &description, &category, &audioFile, &name, &email)
@@ -108,6 +110,7 @@ func findAll(ctx context.Context, tx *sql.Tx, page, limit uint16) (shorts []*mod
 		"creators AS c " +
 		"WHERE " +
 		"c.id = a.creator_id " +
+		"AND status != deleted " +
 		"ORDER BY a.id ASC " +
 		"LIMIT $1 " +
 		"OFFSET $2"
@@ -157,7 +160,7 @@ func createOne(ctx context.Context, tx *sql.Tx, input *model.AudioShortInput) (e
 		"$6 " +
 		")"
 
-	_, err = tx.ExecContext(ctx, query, input.Title, input.Description, "active", input.Category.String(), input.AudioFile, input.Creator.ID)
+	_, err = tx.ExecContext(ctx, query, input.Title, input.Description, model.StatusActive.String(), input.Category.String(), input.AudioFile, input.Creator.ID)
 	return
 }
 
@@ -176,7 +179,18 @@ func updateOne(ctx context.Context, tx *sql.Tx, id string, input *model.AudioSho
 	return
 }
 
-func deleteOne(ctx context.Context, tx *sql.Tx, id string) (err error) {
+func softDeleteOne(ctx context.Context, tx *sql.Tx, id string) (err error) {
+	query := "UPDATE " +
+		"audio_shorts " +
+		"SET " +
+		"status = $1 " +
+		"WHERE id = $2"
+
+	_, err = tx.ExecContext(ctx, query, model.StatusDeleted.String(), id)
+	return
+}
+
+func hardDeleteOne(ctx context.Context, tx *sql.Tx, id string) (err error) {
 	query := "DELETE FROM " +
 		"audio_shorts " +
 		"WHERE id = $1"
