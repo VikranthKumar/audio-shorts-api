@@ -3,21 +3,19 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	"github.com/nooble/task/audio-short-api/pkg/config"
 
 	_ "github.com/lib/pq"
 )
 
-func New(config interface{}) (db *sql.DB, err error) {
-	//TODO use config
-	const (
-		host     = "localhost"
-		port     = 5432
-		user     = "postgres"
-		password = "abc"
-		dbname   = "nooble_task"
+func New(config *config.Config) (db *sql.DB, err error) {
+	var (
+		host     = config.Postgres.Host
+		port     = config.Postgres.Port
+		user     = config.Postgres.Username
+		password = config.Postgres.Password
+		dbname   = config.Postgres.Database
 	)
-	// dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
-	url := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", user, password, host, port, dbname)
-
+	url := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", user, password, host, port, dbname)
 	return sql.Open("postgres", url)
 }

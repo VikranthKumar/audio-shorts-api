@@ -2,32 +2,31 @@ package main
 
 import (
 	"context"
+	"net/http"
+
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/nooble/task/audio-short-api/pkg/api"
 	"github.com/nooble/task/audio-short-api/pkg/api/generated"
-	"net/http"
-	"os"
-
+	"github.com/nooble/task/audio-short-api/pkg/config"
 	"github.com/nooble/task/audio-short-api/pkg/db"
 	"github.com/nooble/task/audio-short-api/pkg/logging"
 	"github.com/nooble/task/audio-short-api/pkg/store"
 	"github.com/nooble/task/audio-short-api/pkg/util"
 )
 
-const defaultPort = "8080"
-
 func main() {
 	ctx := context.Background()
-
-	// =========== config ============= //
-	//TODO add config
 
 	// =========== logger ============= //
 	ctx = logging.NewContext(ctx)
 
+	// =========== config ============= //
+	cfg, err := config.New()
+	util.ExitOnErr(ctx, err)
+
 	// =========== db ============= //
-	pgDB, err := db.New("")
+	pgDB, err := db.New(cfg)
 	util.ExitOnErr(ctx, err)
 	defer pgDB.Close()
 
@@ -40,15 +39,11 @@ func main() {
 	util.ExitOnErr(ctx, err)
 
 	// =========== server ============= //
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = defaultPort
-	}
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver}))
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", srv)
 
 	logging.WithContext(ctx).Info("connected for GraphQL playground")
-	err = http.ListenAndServe(":"+port, nil)
+	err = http.ListenAndServe(cfg.Server.Host+":"+cfg.Server.Port, nil)
 	util.ExitOnErr(ctx, err)
 }
