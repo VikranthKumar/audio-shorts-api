@@ -305,7 +305,7 @@ type Mutation {
 }
 
 type Query {
-  getAudioShorts(page: Int = 0, limit: Int = 0): [AudioShort!]
+  getAudioShorts(page: Int = 1, limit: Int = 10): [AudioShort!]
   getAudioShort(id: ID!): AudioShort
 }
 
