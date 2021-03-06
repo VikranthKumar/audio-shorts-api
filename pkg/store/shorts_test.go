@@ -22,14 +22,14 @@ func TestShortsStore_GetByID(t *testing.T) {
 	)
 	db, sqlMock, err := sqlmock.New()
 	assert.NoError(t, err)
-	store, err := New(db)
+	store, err := NewShortsStore(db)
 	assert.NoError(t, err)
 
 	sqlMock.ExpectBegin()
 	sqlMock.ExpectQuery(
 		regexp.QuoteMeta("SELECT a.title, a.description, a.category, a.audio_file, c.name, c.email FROM audio_shorts AS a,creators AS c WHERE c.id = a.creator_id AND a.id = $1 AND a.status != 'deleted'")).
 		WithArgs(ID).
-		WillReturnRows(sqlmock.NewRows([]string{"title", "description", "category", "audio_file", "username", "email"}).
+		WillReturnRows(sqlmock.NewRows([]string{"title", "description", "category", "audio_file", "name", "email"}).
 			AddRow(title, description, category, audioFile, name, email))
 	sqlMock.ExpectCommit()
 
@@ -55,14 +55,14 @@ func TestShortsStore_GetAll(t *testing.T) {
 	)
 	db, sqlMock, err := sqlmock.New()
 	assert.NoError(t, err)
-	store, err := New(db)
+	store, err := NewShortsStore(db)
 	assert.NoError(t, err)
 
 	sqlMock.ExpectBegin()
 	sqlMock.ExpectQuery(
 		regexp.QuoteMeta("SELECT a.id, a.title, a.description, a.category, a.audio_file, c.name, c.email FROM audio_shorts AS a,creators AS c WHERE c.id = a.creator_id AND a.status != 'deleted' ORDER BY a.id ASC LIMIT $1 OFFSET $2")).
 		WithArgs(1, 0).
-		WillReturnRows(sqlmock.NewRows([]string{"id", "title", "description", "category", "audio_file", "username", "email"}).
+		WillReturnRows(sqlmock.NewRows([]string{"id", "title", "description", "category", "audio_file", "name", "email"}).
 			AddRow(ID, title, description, category, audioFile, name, email))
 	sqlMock.ExpectCommit()
 
@@ -91,7 +91,7 @@ func TestShortsStore_Create(t *testing.T) {
 	)
 	db, sqlMock, err := sqlmock.New()
 	assert.NoError(t, err)
-	store, err := New(db)
+	store, err := NewShortsStore(db)
 	assert.NoError(t, err)
 
 	input := &model.AudioShortInput{
@@ -137,7 +137,7 @@ func TestShortsStore_Update(t *testing.T) {
 	)
 	db, sqlMock, err := sqlmock.New()
 	assert.NoError(t, err)
-	store, err := New(db)
+	store, err := NewShortsStore(db)
 	assert.NoError(t, err)
 
 	input := &model.AudioShortInput{
@@ -183,7 +183,7 @@ func TestShortsStore_Delete(t *testing.T) {
 	)
 	db, sqlMock, err := sqlmock.New()
 	assert.NoError(t, err)
-	store, err := New(db)
+	store, err := NewShortsStore(db)
 	assert.NoError(t, err)
 
 	sqlMock.ExpectBegin()
@@ -220,7 +220,7 @@ func TestShortsStore_HardDelete(t *testing.T) {
 	)
 	db, sqlMock, err := sqlmock.New()
 	assert.NoError(t, err)
-	store, err := New(db)
+	store, err := NewShortsStore(db)
 	assert.NoError(t, err)
 
 	sqlMock.ExpectBegin()

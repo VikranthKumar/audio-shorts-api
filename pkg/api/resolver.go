@@ -5,9 +5,10 @@ import "github.com/nooble/task/audio-short-api/pkg/store"
 //go:generate go run github.com/99designs/gqlgen
 
 type Resolver struct {
-	store store.AudioShortsStore
+	shortsStore   store.AudioShortsStore
+	creatorsStore store.CreatorsStore
 }
 
-func New(store store.AudioShortsStore) (*Resolver, error) {
-	return &Resolver{store: store}, nil
+func New(shortsStore store.AudioShortsStore, creatorsStore store.CreatorsStore) (*Resolver, error) {
+	return &Resolver{shortsStore: shortsStore, creatorsStore: creatorsStore}, nil
 }

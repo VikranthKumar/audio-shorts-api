@@ -31,11 +31,14 @@ func main() {
 	defer pgDB.Close()
 
 	// =========== datastore ============= //
-	asStore, err := store.New(pgDB)
+	asStore, err := store.NewShortsStore(pgDB)
+	util.ExitOnErr(ctx, err)
+
+	cStore, err := store.NewCreatorsStore(pgDB)
 	util.ExitOnErr(ctx, err)
 
 	// =========== resolver ============= //
-	resolver, err := api.New(asStore)
+	resolver, err := api.New(asStore, cStore)
 	util.ExitOnErr(ctx, err)
 
 	// =========== server ============= //

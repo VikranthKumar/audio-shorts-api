@@ -18,6 +18,7 @@ type Mutation {
 type Query {
   getAudioShorts(page: Int = 1, limit: Int = 10): [AudioShort!]
   getAudioShort(id: ID!): AudioShort
+  getCreators(page: Int = 1, limit: Int = 10): [Creator!]
 }
 
 input AudioShortInput {
@@ -38,6 +39,7 @@ type AudioShort {
 }
 
 type Creator {
+  id: ID!
   name: String!
   email: String!
 }

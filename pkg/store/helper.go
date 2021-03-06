@@ -87,7 +87,7 @@ func findOneByUnique(ctx context.Context, tx *sql.Tx, inputTitle string, creator
 	return
 }
 
-func findAll(ctx context.Context, tx *sql.Tx, page, limit uint16) (shorts []*model.AudioShort, err error) {
+func findAllShorts(ctx context.Context, tx *sql.Tx, page, limit uint16) (shorts []*model.AudioShort, err error) {
 	shorts = make([]*model.AudioShort, 0, limit) // set cap at limit
 	var (
 		id          string
@@ -198,5 +198,44 @@ func hardDeleteOne(ctx context.Context, tx *sql.Tx, id string) (err error) {
 		"WHERE id = $1"
 
 	_, err = tx.ExecContext(ctx, query, id)
+	return
+}
+
+func findAllCreators(ctx context.Context, tx *sql.Tx, page, limit uint16) (creators []*model.Creator, err error) {
+	creators = make([]*model.Creator, 0, limit) // set cap at limit
+	var (
+		id    string
+		name  string
+		email string
+	)
+	query := "SELECT " +
+		"id, " +
+		"name, " +
+		"email " +
+		"FROM creators " +
+		"ORDER BY id ASC " +
+		"LIMIT $1 " +
+		"OFFSET $2"
+
+	rows, err := tx.QueryContext(ctx, query, limit, page)
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		err = rows.Close()
+	}()
+
+	for rows.Next() {
+		err = rows.Scan(&id, &name, &email)
+		if err != nil {
+			return nil, err
+		}
+		short := &model.Creator{
+			ID:    id,
+			Name:  name,
+			Email: email,
+		}
+		creators = append(creators, short)
+	}
 	return
 }

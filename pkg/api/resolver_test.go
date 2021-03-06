@@ -14,7 +14,7 @@ import (
 func TestQueryResolver_GetAudioShort(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	mockStore := store.NewMockAudioShortsStore(ctrl)
-	resolver, err := New(mockStore)
+	resolver, err := New(mockStore, nil)
 	assert.NoError(t, err)
 	c := client.New(handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver})))
 
@@ -64,7 +64,7 @@ func TestQueryResolver_GetAudioShort(t *testing.T) {
 func TestQueryResolver_GetAudioShorts(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	mockStore := store.NewMockAudioShortsStore(ctrl)
-	resolver, err := New(mockStore)
+	resolver, err := New(mockStore, nil)
 	assert.NoError(t, err)
 	c := client.New(handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver})))
 
@@ -128,10 +128,74 @@ func TestQueryResolver_GetAudioShorts(t *testing.T) {
 	})
 }
 
+func TestQueryResolver_GetCreators(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	mockStore := store.NewMockCreatorsStore(ctrl)
+	resolver, err := New(nil, mockStore)
+	assert.NoError(t, err)
+	c := client.New(handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver})))
+
+	creator := &model.Creator{
+		ID:    "1",
+		Name:  "hi",
+		Email: "mockemail@gmail.com",
+	}
+
+	t.Run("happy path", func(t *testing.T) {
+		mockStore.EXPECT().GetAll(gomock.Any(), uint16(0), uint16(1)).Return([]*model.Creator{creator}, nil)
+		var resp struct {
+			GetCreators []struct{ ID, Name string }
+		}
+		q := `
+		query {
+			getCreators(page: 1, limit: 1) {
+				id,
+				name
+			}
+		}`
+		c.MustPost(q, &resp)
+		assert.Equal(t, "1", resp.GetCreators[0].ID)
+		assert.Equal(t, "hi", resp.GetCreators[0].Name)
+	})
+
+	t.Run("happy path - default args", func(t *testing.T) {
+		mockStore.EXPECT().GetAll(gomock.Any(), uint16(0), uint16(10)).Return([]*model.Creator{creator}, nil)
+		var resp struct {
+			GetCreators []struct{ ID, Name string }
+		}
+		q := `
+		query {
+			getCreators {
+				id,
+				name
+			}
+		}`
+		c.MustPost(q, &resp)
+		assert.Equal(t, "1", resp.GetCreators[0].ID)
+		assert.Equal(t, "hi", resp.GetCreators[0].Name)
+	})
+
+	t.Run("sad path - page is 0", func(t *testing.T) {
+		var resp struct {
+			GetCreators []struct{ ID, Name string }
+		}
+		q := `
+		query {
+			getCreators(page: 0, limit: 1) {
+				id,
+				name
+			}
+		}`
+		assert.Panics(t, func() {
+			c.MustPost(q, &resp)
+		})
+	})
+}
+
 func TestMutationResolver_UpdateAudioShort(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	mockStore := store.NewMockAudioShortsStore(ctrl)
-	resolver, err := New(mockStore)
+	resolver, err := New(mockStore, nil)
 	assert.NoError(t, err)
 	c := client.New(handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver})))
 
@@ -178,7 +242,7 @@ func TestMutationResolver_UpdateAudioShort(t *testing.T) {
 func TestMutationResolver_CreateAudioShort(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	mockStore := store.NewMockAudioShortsStore(ctrl)
-	resolver, err := New(mockStore)
+	resolver, err := New(mockStore, nil)
 	assert.NoError(t, err)
 	c := client.New(handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver})))
 
@@ -225,7 +289,7 @@ func TestMutationResolver_CreateAudioShort(t *testing.T) {
 func TestMutationResolver_DeleteAudioShort(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	mockStore := store.NewMockAudioShortsStore(ctrl)
-	resolver, err := New(mockStore)
+	resolver, err := New(mockStore, nil)
 	assert.NoError(t, err)
 	c := client.New(handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver})))
 
@@ -259,7 +323,7 @@ func TestMutationResolver_DeleteAudioShort(t *testing.T) {
 func TestMutationResolver_HardDeleteAudioShort(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	mockStore := store.NewMockAudioShortsStore(ctrl)
-	resolver, err := New(mockStore)
+	resolver, err := New(mockStore, nil)
 	assert.NoError(t, err)
 
 	c := client.New(handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver})))

@@ -15,7 +15,7 @@ import (
 func (r *mutationResolver) CreateAudioShort(ctx context.Context, input model.AudioShortInput) (*model.AudioShort, error) {
 	ctx = logging.NewContext(ctx)
 	logging.WithContext(ctx).Info("Create Audio Short")
-	short, err := r.store.Create(ctx, &input)
+	short, err := r.shortsStore.Create(ctx, &input)
 	if err != nil {
 		logging.WithContext(ctx).Error(errors.Wrap(err, ErrorMessageCreateFailed).Error())
 		return nil, errors.New(ErrorMessageCreateFailed)
@@ -26,7 +26,7 @@ func (r *mutationResolver) CreateAudioShort(ctx context.Context, input model.Aud
 func (r *mutationResolver) UpdateAudioShort(ctx context.Context, id string, input model.AudioShortInput) (*model.AudioShort, error) {
 	ctx = logging.NewContext(ctx)
 	logging.WithContext(ctx).Info("Update Audio Short With ID " + id)
-	short, err := r.store.Update(ctx, id, &input)
+	short, err := r.shortsStore.Update(ctx, id, &input)
 	if err != nil {
 		logging.WithContext(ctx).Error(errors.Wrap(err, ErrorMessageUpdateFailed).Error())
 		return nil, errors.New(ErrorMessageUpdateFailed)
@@ -37,7 +37,7 @@ func (r *mutationResolver) UpdateAudioShort(ctx context.Context, id string, inpu
 func (r *mutationResolver) DeleteAudioShort(ctx context.Context, id string) (*model.AudioShort, error) {
 	ctx = logging.NewContext(ctx)
 	logging.WithContext(ctx).Info("Delete Audio Short With ID " + id)
-	short, err := r.store.Delete(ctx, id)
+	short, err := r.shortsStore.Delete(ctx, id)
 	if err != nil {
 		logging.WithContext(ctx).Error(errors.Wrap(err, ErrorMessageDeleteFailed).Error())
 		return nil, errors.New(ErrorMessageDeleteFailed)
@@ -48,7 +48,7 @@ func (r *mutationResolver) DeleteAudioShort(ctx context.Context, id string) (*mo
 func (r *mutationResolver) HardDeleteAudioShort(ctx context.Context, id string) (*model.AudioShort, error) {
 	ctx = logging.NewContext(ctx)
 	logging.WithContext(ctx).Info("Hard Delete Audio Short With ID " + id)
-	short, err := r.store.HardDelete(ctx, id)
+	short, err := r.shortsStore.HardDelete(ctx, id)
 	if err != nil {
 		logging.WithContext(ctx).Error(errors.Wrap(err, ErrorMessageHardDeleteFailed).Error())
 		return nil, errors.New(ErrorMessageHardDeleteFailed)
@@ -62,7 +62,7 @@ func (r *queryResolver) GetAudioShorts(ctx context.Context, page *int, limit *in
 	if *page < 1 {
 		return nil, errors.New(ErrorMessageBadRequest)
 	}
-	shorts, err := r.store.GetAll(ctx, uint16(*page)-1, uint16(*limit))
+	shorts, err := r.shortsStore.GetAll(ctx, uint16(*page)-1, uint16(*limit))
 	if err != nil {
 		logging.WithContext(ctx).Error(errors.Wrap(err, ErrorMessageReadFailed).Error())
 		return nil, errors.New(ErrorMessageReadFailed)
@@ -73,12 +73,26 @@ func (r *queryResolver) GetAudioShorts(ctx context.Context, page *int, limit *in
 func (r *queryResolver) GetAudioShort(ctx context.Context, id string) (*model.AudioShort, error) {
 	ctx = logging.NewContext(ctx)
 	logging.WithContext(ctx).Info("Get Audio Short With ID " + id)
-	short, err := r.store.GetByID(ctx, id)
+	short, err := r.shortsStore.GetByID(ctx, id)
 	if err != nil {
 		logging.WithContext(ctx).Error(errors.Wrap(err, ErrorMessageReadFailed).Error())
 		return nil, errors.New(ErrorMessageReadFailed)
 	}
 	return short, nil
+}
+
+func (r *queryResolver) GetCreators(ctx context.Context, page *int, limit *int) ([]*model.Creator, error) {
+	ctx = logging.NewContext(ctx)
+	logging.WithContext(ctx).Info("Get Creators")
+	if *page < 1 {
+		return nil, errors.New(ErrorMessageBadRequest)
+	}
+	shorts, err := r.creatorsStore.GetAll(ctx, uint16(*page)-1, uint16(*limit))
+	if err != nil {
+		logging.WithContext(ctx).Error(errors.Wrap(err, ErrorMessageReadFailed).Error())
+		return nil, errors.New(ErrorMessageReadFailed)
+	}
+	return shorts, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

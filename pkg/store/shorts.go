@@ -27,7 +27,7 @@ type (
 	}
 )
 
-func New(db *sql.DB) (AudioShortsStore, error) {
+func NewShortsStore(db *sql.DB) (AudioShortsStore, error) {
 	return &shortsStore{
 		db: db,
 	}, nil
@@ -83,7 +83,7 @@ func (s *shortsStore) GetAll(ctx context.Context, page, limit uint16) (shorts []
 		}
 	}()
 
-	shorts, err = findAll(ctx, tx, page, limit)
+	shorts, err = findAllShorts(ctx, tx, page, limit)
 	if err != nil {
 		return nil, errors.Wrap(err, ErrorMessageFindFailed)
 	}
