@@ -33,6 +33,7 @@ type AudioShort {
   id: ID!
   title: String!
   description: String!
+  status: Status!
   category: Category!
   audio_file: String!
   creator: Creator!

@@ -12,6 +12,7 @@ type AudioShort struct {
 	ID          string   `json:"id"`
 	Title       string   `json:"title"`
 	Description string   `json:"description"`
+	Status      Status   `json:"status"`
 	Category    Category `json:"category"`
 	AudioFile   string   `json:"audio_file"`
 	Creator     *Creator `json:"creator"`

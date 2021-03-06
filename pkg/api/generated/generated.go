@@ -48,6 +48,7 @@ type ComplexityRoot struct {
 		Creator     func(childComplexity int) int
 		Description func(childComplexity int) int
 		ID          func(childComplexity int) int
+		Status      func(childComplexity int) int
 		Title       func(childComplexity int) int
 	}
 
@@ -132,6 +133,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AudioShort.ID(childComplexity), true
+
+	case "AudioShort.status":
+		if e.complexity.AudioShort.Status == nil {
+			break
+		}
+
+		return e.complexity.AudioShort.Status(childComplexity), true
 
 	case "AudioShort.title":
 		if e.complexity.AudioShort.Title == nil {
@@ -344,6 +352,7 @@ type AudioShort {
   id: ID!
   title: String!
   description: String!
+  status: Status!
   category: Category!
   audio_file: String!
   creator: Creator!
@@ -666,6 +675,41 @@ func (ec *executionContext) _AudioShort_description(ctx context.Context, field g
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AudioShort_status(ctx context.Context, field graphql.CollectedField, obj *model.AudioShort) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AudioShort",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(model.Status)
+	fc.Result = res
+	return ec.marshalNStatus2githubᚗcomᚋnoobleᚋtaskᚋaudioᚑshortᚑapiᚋpkgᚋapiᚋmodelᚐStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _AudioShort_category(ctx context.Context, field graphql.CollectedField, obj *model.AudioShort) (ret graphql.Marshaler) {
@@ -2415,6 +2459,11 @@ func (ec *executionContext) _AudioShort(ctx context.Context, sel ast.SelectionSe
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "status":
+			out.Values[i] = ec._AudioShort_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "category":
 			out.Values[i] = ec._AudioShort_category(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -2888,6 +2937,16 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNStatus2githubᚗcomᚋnoobleᚋtaskᚋaudioᚑshortᚑapiᚋpkgᚋapiᚋmodelᚐStatus(ctx context.Context, v interface{}) (model.Status, error) {
+	var res model.Status
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNStatus2githubᚗcomᚋnoobleᚋtaskᚋaudioᚑshortᚑapiᚋpkgᚋapiᚋmodelᚐStatus(ctx context.Context, sel ast.SelectionSet, v model.Status) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {

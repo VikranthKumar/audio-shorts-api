@@ -10,34 +10,39 @@ func findOneByID(ctx context.Context, tx *sql.Tx, id string) (short *model.Audio
 	var (
 		title       string
 		description string
+		status      string
 		category    string
 		audioFile   string
+		creatorID   string
 		name        string
 		email       string
 	)
 	query := "SELECT " +
 		"a.title, " +
 		"a.description, " +
+		"a.status, " +
 		"a.category, " +
 		"a.audio_file, " +
+		"c.id, " +
 		"c.name, " +
 		"c.email " +
 		"FROM audio_shorts AS a," +
 		"creators AS c " +
 		"WHERE " +
 		"c.id = a.creator_id " +
-		"AND a.id = $1 " +
-		"AND a.status != 'deleted'"
+		"AND a.id = $1"
 
 	row := tx.QueryRowContext(ctx, query, id)
-	err = row.Scan(&title, &description, &category, &audioFile, &name, &email)
+	err = row.Scan(&title, &description, &status, &category, &audioFile, &creatorID, &name, &email)
 	short = &model.AudioShort{
 		ID:          id,
 		Title:       title,
 		Description: description,
+		Status:      model.Status(status),
 		Category:    model.Category(category),
 		AudioFile:   audioFile,
 		Creator: &model.Creator{
+			ID:    creatorID,
 			Name:  name,
 			Email: email,
 		},
@@ -50,6 +55,7 @@ func findOneByUnique(ctx context.Context, tx *sql.Tx, inputTitle string, creator
 		id          string
 		title       string
 		description string
+		status      string
 		category    string
 		audioFile   string
 		name        string
@@ -59,6 +65,7 @@ func findOneByUnique(ctx context.Context, tx *sql.Tx, inputTitle string, creator
 		"a.id, " +
 		"a.title, " +
 		"a.description, " +
+		"a.status, " +
 		"a.category, " +
 		"a.audio_file, " +
 		"c.name, " +
@@ -68,18 +75,19 @@ func findOneByUnique(ctx context.Context, tx *sql.Tx, inputTitle string, creator
 		"WHERE " +
 		"c.id = a.creator_id " +
 		"AND a.title = $1 " +
-		"AND a.creator_id = $2 " +
-		"AND a.status != 'deleted'"
+		"AND a.creator_id = $2"
 
 	row := tx.QueryRowContext(ctx, query, inputTitle, creatorID)
-	err = row.Scan(&id, &title, &description, &category, &audioFile, &name, &email)
+	err = row.Scan(&id, &title, &description, &status, &category, &audioFile, &name, &email)
 	short = &model.AudioShort{
 		ID:          id,
 		Title:       title,
 		Description: description,
+		Status:      model.Status(status),
 		Category:    model.Category(category),
 		AudioFile:   audioFile,
 		Creator: &model.Creator{
+			ID:    creatorID,
 			Name:  name,
 			Email: email,
 		},
@@ -93,8 +101,10 @@ func findAllShorts(ctx context.Context, tx *sql.Tx, page, limit uint16) (shorts 
 		id          string
 		title       string
 		description string
+		status      string
 		category    string
 		audioFile   string
+		creatorID   string
 		name        string
 		email       string
 	)
@@ -102,15 +112,16 @@ func findAllShorts(ctx context.Context, tx *sql.Tx, page, limit uint16) (shorts 
 		"a.id, " +
 		"a.title, " +
 		"a.description, " +
+		"a.status, " +
 		"a.category, " +
 		"a.audio_file, " +
+		"c.id, " +
 		"c.name, " +
 		"c.email " +
 		"FROM audio_shorts AS a," +
 		"creators AS c " +
 		"WHERE " +
 		"c.id = a.creator_id " +
-		"AND a.status != 'deleted' " +
 		"ORDER BY a.id ASC " +
 		"LIMIT $1 " +
 		"OFFSET $2"
@@ -124,7 +135,7 @@ func findAllShorts(ctx context.Context, tx *sql.Tx, page, limit uint16) (shorts 
 	}()
 
 	for rows.Next() {
-		err = rows.Scan(&id, &title, &description, &category, &audioFile, &name, &email)
+		err = rows.Scan(&id, &title, &description, &status, &category, &audioFile, &creatorID, &name, &email)
 		if err != nil {
 			return nil, err
 		}
@@ -132,9 +143,11 @@ func findAllShorts(ctx context.Context, tx *sql.Tx, page, limit uint16) (shorts 
 			ID:          id,
 			Title:       title,
 			Description: description,
+			Status:      model.Status(status),
 			Category:    model.Category(category),
 			AudioFile:   audioFile,
 			Creator: &model.Creator{
+				ID:    creatorID,
 				Name:  name,
 				Email: email,
 			},

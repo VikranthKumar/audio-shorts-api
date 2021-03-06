@@ -15,8 +15,10 @@ func TestShortsStore_GetByID(t *testing.T) {
 		ID          = "1"
 		title       = "abc"
 		description = "abcs"
+		status      = model.StatusActive
 		category    = model.CategoryNews
 		audioFile   = "a"
+		creatorID   = "1"
 		name        = "hi"
 		email       = "mockemail@gmail.com"
 	)
@@ -27,10 +29,10 @@ func TestShortsStore_GetByID(t *testing.T) {
 
 	sqlMock.ExpectBegin()
 	sqlMock.ExpectQuery(
-		regexp.QuoteMeta("SELECT a.title, a.description, a.category, a.audio_file, c.name, c.email FROM audio_shorts AS a,creators AS c WHERE c.id = a.creator_id AND a.id = $1 AND a.status != 'deleted'")).
+		regexp.QuoteMeta("SELECT a.title, a.description, a.status, a.category, a.audio_file, c.id, c.name, c.email FROM audio_shorts AS a,creators AS c WHERE c.id = a.creator_id AND a.id = $1")).
 		WithArgs(ID).
-		WillReturnRows(sqlmock.NewRows([]string{"title", "description", "category", "audio_file", "name", "email"}).
-			AddRow(title, description, category, audioFile, name, email))
+		WillReturnRows(sqlmock.NewRows([]string{"title", "description", "status", "category", "audio_file", "id", "name", "email"}).
+			AddRow(title, description, status, category, audioFile, creatorID, name, email))
 	sqlMock.ExpectCommit()
 
 	ctx := logging.NewContext(context.Background())
@@ -48,8 +50,10 @@ func TestShortsStore_GetAll(t *testing.T) {
 		ID          = "1"
 		title       = "abc"
 		description = "abcs"
+		status      = model.StatusActive
 		category    = model.CategoryNews
 		audioFile   = "a"
+		creatorID   = "1"
 		name        = "hi"
 		email       = "mockemail@gmail.com"
 	)
@@ -60,10 +64,10 @@ func TestShortsStore_GetAll(t *testing.T) {
 
 	sqlMock.ExpectBegin()
 	sqlMock.ExpectQuery(
-		regexp.QuoteMeta("SELECT a.id, a.title, a.description, a.category, a.audio_file, c.name, c.email FROM audio_shorts AS a,creators AS c WHERE c.id = a.creator_id AND a.status != 'deleted' ORDER BY a.id ASC LIMIT $1 OFFSET $2")).
+		regexp.QuoteMeta("SELECT a.id, a.title, a.description, a.status, a.category, a.audio_file, c.id, c.name, c.email FROM audio_shorts AS a,creators AS c WHERE c.id = a.creator_id ORDER BY a.id ASC LIMIT $1 OFFSET $2")).
 		WithArgs(1, 0).
-		WillReturnRows(sqlmock.NewRows([]string{"id", "title", "description", "category", "audio_file", "name", "email"}).
-			AddRow(ID, title, description, category, audioFile, name, email))
+		WillReturnRows(sqlmock.NewRows([]string{"id", "title", "description", "status", "category", "audio_file", "id", "name", "email"}).
+			AddRow(ID, title, description, status, category, audioFile, creatorID, name, email))
 	sqlMock.ExpectCommit()
 
 	ctx := logging.NewContext(context.Background())
@@ -108,10 +112,10 @@ func TestShortsStore_Create(t *testing.T) {
 		WithArgs(title, description, status, category, audioFile, creatorID).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	sqlMock.ExpectQuery(
-		regexp.QuoteMeta("SELECT a.id, a.title, a.description, a.category, a.audio_file, c.name, c.email FROM audio_shorts AS a,creators AS c WHERE c.id = a.creator_id AND a.title = $1 AND a.creator_id = $2 AND a.status != 'deleted'")).
+		regexp.QuoteMeta("SELECT a.id, a.title, a.description, a.status, a.category, a.audio_file, c.name, c.email FROM audio_shorts AS a,creators AS c WHERE c.id = a.creator_id AND a.title = $1 AND a.creator_id = $2")).
 		WithArgs(title, creatorID).
-		WillReturnRows(sqlmock.NewRows([]string{"id", "title", "description", "category", "audio_file", "name", "email"}).
-			AddRow(ID, title, description, category, audioFile, name, email))
+		WillReturnRows(sqlmock.NewRows([]string{"id", "title", "description", "status", "category", "audio_file", "name", "email"}).
+			AddRow(ID, title, description, status, category, audioFile, name, email))
 	sqlMock.ExpectCommit()
 
 	ctx := logging.NewContext(context.Background())
@@ -129,6 +133,7 @@ func TestShortsStore_Update(t *testing.T) {
 		ID          = "1"
 		title       = "abc"
 		description = "abcs"
+		status      = model.StatusActive
 		category    = model.CategoryNews
 		audioFile   = "a"
 		creatorID   = "1"
@@ -154,10 +159,10 @@ func TestShortsStore_Update(t *testing.T) {
 		WithArgs(title, description, category, audioFile, creatorID, ID).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	sqlMock.ExpectQuery(
-		regexp.QuoteMeta("SELECT a.title, a.description, a.category, a.audio_file, c.name, c.email FROM audio_shorts AS a,creators AS c WHERE c.id = a.creator_id AND a.id = $1 AND a.status != 'deleted'")).
+		regexp.QuoteMeta("SELECT a.title, a.description, a.status, a.category, a.audio_file, c.id, c.name, c.email FROM audio_shorts AS a,creators AS c WHERE c.id = a.creator_id AND a.id = $1")).
 		WithArgs(ID).
-		WillReturnRows(sqlmock.NewRows([]string{"title", "description", "category", "audio_file", "name", "email"}).
-			AddRow(title, description, category, audioFile, name, email))
+		WillReturnRows(sqlmock.NewRows([]string{"title", "description", "status", "category", "audio_file", "id", "name", "email"}).
+			AddRow(title, description, status, category, audioFile, creatorID, name, email))
 	sqlMock.ExpectCommit()
 
 	ctx := logging.NewContext(context.Background())
@@ -178,6 +183,7 @@ func TestShortsStore_Delete(t *testing.T) {
 		category    = model.CategoryNews
 		status      = model.StatusDeleted
 		audioFile   = "a"
+		creatorID   = "1"
 		name        = "hi"
 		email       = "mockemail@gmail.com"
 	)
@@ -187,15 +193,15 @@ func TestShortsStore_Delete(t *testing.T) {
 	assert.NoError(t, err)
 
 	sqlMock.ExpectBegin()
-	sqlMock.ExpectQuery(
-		regexp.QuoteMeta("SELECT a.title, a.description, a.category, a.audio_file, c.name, c.email FROM audio_shorts AS a,creators AS c WHERE c.id = a.creator_id AND a.id = $1 AND a.status != 'deleted'")).
-		WithArgs(ID).
-		WillReturnRows(sqlmock.NewRows([]string{"title", "description", "category", "audio_file", "name", "email"}).
-			AddRow(title, description, category, audioFile, name, email))
 	sqlMock.ExpectExec(
 		regexp.QuoteMeta("UPDATE audio_shorts SET status = $1 WHERE id = $2")).
 		WithArgs(status, ID).
 		WillReturnResult(sqlmock.NewResult(1, 1))
+	sqlMock.ExpectQuery(
+		regexp.QuoteMeta("SELECT a.title, a.description, a.status, a.category, a.audio_file, c.id, c.name, c.email FROM audio_shorts AS a,creators AS c WHERE c.id = a.creator_id AND a.id = $1")).
+		WithArgs(ID).
+		WillReturnRows(sqlmock.NewRows([]string{"title", "description", "status", "category", "audio_file", "id", "name", "email"}).
+			AddRow(title, description, status, category, audioFile, creatorID, name, email))
 	sqlMock.ExpectCommit()
 
 	ctx := logging.NewContext(context.Background())
@@ -213,8 +219,10 @@ func TestShortsStore_HardDelete(t *testing.T) {
 		ID          = "1"
 		title       = "abc"
 		description = "abcs"
+		status      = model.StatusActive
 		category    = model.CategoryNews
 		audioFile   = "a"
+		creatorID   = "1"
 		name        = "hi"
 		email       = "mockemail@gmail.com"
 	)
@@ -225,10 +233,10 @@ func TestShortsStore_HardDelete(t *testing.T) {
 
 	sqlMock.ExpectBegin()
 	sqlMock.ExpectQuery(
-		regexp.QuoteMeta("SELECT a.title, a.description, a.category, a.audio_file, c.name, c.email FROM audio_shorts AS a,creators AS c WHERE c.id = a.creator_id AND a.id = $1 AND a.status != 'deleted'")).
+		regexp.QuoteMeta("SELECT a.title, a.description, a.status, a.category, a.audio_file, c.id, c.name, c.email FROM audio_shorts AS a,creators AS c WHERE c.id = a.creator_id AND a.id = $1")).
 		WithArgs(ID).
-		WillReturnRows(sqlmock.NewRows([]string{"title", "description", "category", "audio_file", "name", "email"}).
-			AddRow(title, description, category, audioFile, name, email))
+		WillReturnRows(sqlmock.NewRows([]string{"title", "description", "status", "category", "audio_file", "id", "name", "email"}).
+			AddRow(title, description, status, category, audioFile, creatorID, name, email))
 	sqlMock.ExpectExec(
 		regexp.QuoteMeta("DELETE FROM audio_shorts WHERE id = $1")).
 		WithArgs(ID).

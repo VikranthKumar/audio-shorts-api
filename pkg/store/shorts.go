@@ -185,13 +185,13 @@ func (s *shortsStore) Delete(ctx context.Context, id string) (short *model.Audio
 		}
 	}()
 
-	short, err = findOneByID(ctx, tx, id)
-	if err != nil {
-		return nil, errors.Wrap(err, ErrorMessageFindFailed+" ID:"+id)
-	}
 	err = softDeleteOne(ctx, tx, id)
 	if err != nil {
 		return nil, errors.Wrap(err, ErrorMessageDeleteFailed+" ID:"+id)
+	}
+	short, err = findOneByID(ctx, tx, id)
+	if err != nil {
+		return nil, errors.Wrap(err, ErrorMessageFindFailed+" ID:"+id)
 	}
 
 	err = tx.Commit()
