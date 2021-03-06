@@ -18,4 +18,4 @@ INSERT INTO creators (
     'Rudolph the Reindeer',
     'rudolph@gmail.com',
     'banned'
-)
+) ON CONFLICT (email) DO NOTHING;

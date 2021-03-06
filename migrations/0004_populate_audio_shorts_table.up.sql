@@ -19,4 +19,4 @@ INSERT INTO audio_shorts (
     'news',
     'https://static.cdn.dummyurl.com/ref/djg1xx',
     '2'
- )
+ ) ON CONFLICT (title, creator_id) DO NOTHING;
