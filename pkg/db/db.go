@@ -8,7 +8,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func New(config *config.Config) (db *sql.DB, err error) {
+func NewDB(config *config.Config) (db *sql.DB, err error) {
 	var (
 		host     = config.Postgres.Host
 		port     = config.Postgres.Port

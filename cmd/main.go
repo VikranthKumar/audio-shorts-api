@@ -26,9 +26,22 @@ func main() {
 	util.ExitOnErr(ctx, err)
 
 	// =========== db ============= //
-	pgDB, err := db.New(cfg)
+	pgDB, err := db.NewDB(cfg)
 	util.ExitOnErr(ctx, err)
 	defer pgDB.Close()
+
+	// =========== migrator ============== //
+	m, err := db.NewMigrator(pgDB)
+	util.ExitOnErr(ctx, err)
+	defer m.Close()
+
+	go func() {
+		err := m.Up()
+		if err != nil {
+			m.GracefulStop <- true
+			util.ExitOnErr(ctx, err)
+		}
+	}()
 
 	// =========== datastore ============= //
 	asStore, err := store.NewShortsStore(pgDB)
