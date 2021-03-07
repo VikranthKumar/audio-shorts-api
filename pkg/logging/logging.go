@@ -14,7 +14,6 @@ var logger *zap.Logger
 func initLogger() {
 	cfg := zap.NewDevelopmentConfig()
 	cfg.DisableStacktrace = true
-	cfg.OutputPaths = []string{"logfile.log", "stdout"}
 	logger, _ = cfg.Build()
 }
 
