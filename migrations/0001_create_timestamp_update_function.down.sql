@@ -1,0 +1,1 @@
+DROP FUNCTION IF EXISTS change_updated_at_column;

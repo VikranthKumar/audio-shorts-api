@@ -16,4 +16,6 @@ CREATE TABLE IF NOT EXISTS creators (
     "updated_at" timestamp with time zone DEFAULT now()
 );
 
+CREATE TRIGGER creators_updated_at BEFORE UPDATE ON creators FOR EACH ROW EXECUTE PROCEDURE change_updated_at_column();
+
 COMMIT;

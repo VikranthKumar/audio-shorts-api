@@ -27,4 +27,6 @@ CREATE TABLE IF NOT EXISTS audio_shorts (
     CONSTRAINT fk_creator FOREIGN KEY("creator_id") references creators("id")
 );
 
+CREATE TRIGGER audio_shorts_updated_at BEFORE UPDATE ON audio_shorts FOR EACH ROW EXECUTE PROCEDURE change_updated_at_column();
+
 COMMIT;

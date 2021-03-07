@@ -1,0 +1,408 @@
+{
+	"info": {
+		"_postman_id": "da88ee0c-fe25-4ba6-bbf9-405712339f54",
+		"name": "Audio Shorts API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "mutations",
+			"item": [
+				{
+					"name": "createAudioShort",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"status code is 200\", function() {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"data is not null\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.createAudioShort).to.not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"no error\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.not.include.keys(\"errors\");",
+									"});",
+									"",
+									"pm.test(\"correct data\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var data = jsonData.data.createAudioShort;",
+									"    pm.expect(data.title).to.eql(\"Tech Review\");",
+									"    pm.expect(data.status).to.eql(\"active\");",
+									"    pm.collectionVariables.set(\"shortID\", data.id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation createAudioShort ($input: AudioShortInput!) {\n    createAudioShort (input: $input) {\n        id\n        title\n        description\n        status\n        category\n        audio_file\n        creator {\n            id\n            name\n            email\n        }\n    }\n}",
+								"variables": "{\n  \"input\": {\n    \"title\": \"Tech Review\",\n    \"description\": \"daily tech review\",\n    \"category\": \"review\",\n    \"audio_file\": \"https://someurl.com\",\n    \"creator\": {\n      \"id\": 3\n    }\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{url}}",
+							"host": [
+								"{{url}}"
+							]
+						},
+						"description": "- category is of enum Category which have values of news, story, gossip, and review\n- creator ID must be of an existing creator; this can be found using the getCreators query\n- assumption here is made that a creator cannot have the same shorts title - thus creator ID and shorts title is a composite key "
+					},
+					"response": []
+				},
+				{
+					"name": "updateAudioShort",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"status code is 200\", function() {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"data is not null\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.updateAudioShort).to.not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"no error\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.not.include.keys(\"errors\");",
+									"});",
+									"",
+									"pm.test(\"correct data\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var data = jsonData.data.updateAudioShort;",
+									"    pm.expect(data.title).to.eql(\"Tech Review 2021\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation updateAudioShort ($id: ID!, $input: AudioShortInput!) {\n    updateAudioShort (id: $id, input: $input) {\n        id\n        title\n        description\n        status\n        category\n        audio_file\n        creator {\n            id\n            name\n            email\n        }\n    }\n}",
+								"variables": "{\n  \"id\": \"{{shortID}}\",\n  \"input\": {\n    \"title\": \"Tech Review 2021\",\n    \"description\": \"new tech review\",\n    \"category\": \"review\",\n    \"audio_file\": \"https://new_url\",\n    \"creator\": {\n      \"id\": 3\n    }\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{url}}",
+							"host": [
+								"{{url}}"
+							]
+						},
+						"description": "- take note of the composite key of title and creator ID; any updates made that will violate this constraint returns error"
+					},
+					"response": []
+				},
+				{
+					"name": "deleteAudioShort",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"status code is 200\", function() {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"data is not null\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.deleteAudioShort).to.not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"no error\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.not.include.keys(\"errors\");",
+									"});",
+									"",
+									"pm.test(\"correct data\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var data = jsonData.data.deleteAudioShort;",
+									"    pm.expect(data.title).to.eql(\"Tech Review 2021\");",
+									"    pm.expect(data.status).to.eql(\"deleted\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation deleteAudioShort ($id: ID!) {\n    deleteAudioShort (id: $id) {\n        id\n        title\n        description\n        status\n        category\n        audio_file\n        creator {\n            id\n            name\n            email\n        }\n    }\n}",
+								"variables": "{\n  \"id\": \"{{shortID}}\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{url}}",
+							"host": [
+								"{{url}}"
+							]
+						},
+						"description": "- this performs a soft delete, meaning that the status of the item is set to 'deleted' and is still available in the db\n- to perform a hard delete, use a hardDeleteAudioShorts mutation"
+					},
+					"response": []
+				},
+				{
+					"name": "hardDeleteAudioShort",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"status code is 200\", function() {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"data is not null\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.hardDeleteAudioShort).to.not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"no error\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.not.include.keys(\"errors\");",
+									"});",
+									"",
+									"pm.test(\"correct data\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var data = jsonData.data.hardDeleteAudioShort;",
+									"    pm.expect(data.title).to.eql(\"Tech Review 2021\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation hardDeleteAudioShort ($id: ID!) {\n    hardDeleteAudioShort (id: $id) {\n        id\n        title\n        description\n        status\n        category\n        audio_file\n        creator {\n            id\n            name\n            email\n        }\n    }\n}",
+								"variables": "{\n  \"id\": \"{{shortID}}\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{url}}",
+							"host": [
+								"{{url}}"
+							]
+						},
+						"description": "- this performs a hard delete, removing the item completely from the db"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "queries",
+			"item": [
+				{
+					"name": "getAudioShorts",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"status code is 200\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"no error\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.not.include.keys(\"errors\");",
+									"});",
+									"",
+									"pm.test(\"data is not null\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.getAudioShorts).to.not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"correct count\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.getAudioShorts).to.have.length(2)",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query getAudioShorts ($page: Int, $limit: Int) {\n    getAudioShorts (page: $page, limit: $limit) {\n        id\n        title\n        description\n        status\n        category\n        audio_file\n        creator {\n            id\n            name\n            email\n        }\n    }\n}",
+								"variables": "{\n  \"page\": 1,\n  \"limit\": 2\n}"
+							}
+						},
+						"url": {
+							"raw": "{{url}}",
+							"host": [
+								"{{url}}"
+							]
+						},
+						"description": "- this query is paginated, page starts from 1, orders by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "getAudioShort",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"status code is 200\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"no error\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.not.include.keys(\"errors\");",
+									"});",
+									"",
+									"pm.test(\"data is not null\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.getAudioShorts).to.not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"correct data\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var data = jsonData.data.getAudioShort;",
+									"    pm.expect(data).to.include.key(\"id\");",
+									"    pm.expect(data.id).to.be.eql(\"1\")",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query getAudioShort ($id: ID!) {\n    getAudioShort (id: $id) {\n        id\n        title\n        description\n        status\n        category\n        audio_file\n        creator {\n            id\n            name\n            email\n        }\n    }\n}",
+								"variables": "{\n  \"id\": 1\n}"
+							}
+						},
+						"url": {
+							"raw": "{{url}}",
+							"host": [
+								"{{url}}"
+							]
+						},
+						"description": "- ID can be retrieved from getAudioShorts query"
+					},
+					"response": []
+				},
+				{
+					"name": "getCreators",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"status code is 200\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"no error\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.not.include.keys(\"errors\");",
+									"});",
+									"",
+									"pm.test(\"data is not null\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.getAudioShorts).to.not.eql(null);",
+									"});",
+									"",
+									"pm.test(\"correct count\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.getCreators).to.have.length(2)",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query getCreators ($page: Int, $limit: Int) {\n    getCreators (page: $page, limit: $limit) {\n        id\n        name\n        email\n    }\n}",
+								"variables": "{\n  \"page\": 1,\n  \"limit\": 2\n}"
+							}
+						},
+						"url": {
+							"raw": "{{url}}",
+							"host": [
+								"{{url}}"
+							]
+						},
+						"description": "- this query is paginated, page starts from 1, orders by ID"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "url",
+			"value": "http://127.0.0.1:8080/query"
+		},
+		{
+			"key": "shortID",
+			"value": ""
+		}
+	]
+}

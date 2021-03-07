@@ -3,7 +3,7 @@
 A simple GraphQL Audio Shorts API to perform simple CRUD of audio shorts, built to showcase a backend service written in Go 
 which serves data from a PostgreSQL database. 
 
-Postman Docs [here](audio-shorts-api.postman.json)
+Postman Docs [here](api.postman_collection.json)
 
 ## Overview
 
@@ -11,8 +11,8 @@ Postman Docs [here](audio-shorts-api.postman.json)
 
 1. Two tables are used here: the `audio_shorts` table and `creators` table. `audio_shorts` has a foreign key `creator_id`
 that refers to the `id` primary key field of `creators`. 
-2. `status` field for both `audio_shorts` and `creators`, to provide useful metadata for internal usage - used in `deleteAudioShorts`,
-more info in the API docs.
+2. `status` field for both `audio_shorts` and `creators`, to provide useful metadata for internal usage. Other metadata 
+   includes `created_at`, `updated_at`, and auto-incremented `id`.
 3. `Delete` vs `HardDelete`: `Delete` changes `status` to 'deleted', whereas hard delete removes the entry from `audio_shorts`.
 4. Pagination of audio shorts retrieval, by specifying `page` and `limit` in queries - page must be > 0 i.e. starts from 1.
 5. Unit tests in Go, integration tests using Postman.
