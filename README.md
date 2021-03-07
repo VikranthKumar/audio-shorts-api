@@ -23,4 +23,8 @@ that refers to the `id` primary key field of `creators`.
 ### Local Deployment
 
 The service uses Docker to host the Go backend and the PostgreSQL database. The config can be found in the .env file.
-[WIP] using some script to migrate and start docker-compose
+
+To start, run:
+````
+docker-compose up
+````
