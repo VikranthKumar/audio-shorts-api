@@ -2,6 +2,7 @@ package config
 
 import "github.com/kelseyhightower/envconfig"
 
+// Config stores env variables
 type Config struct {
 	Server struct {
 		Port string `envconfig:"SERVER_PORT" default:"8080"`

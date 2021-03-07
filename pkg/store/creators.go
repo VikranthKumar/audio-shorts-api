@@ -10,6 +10,8 @@ import (
 )
 
 //go:generate mockgen -source=creators.go -destination=creators_mock.go -package=store CreatorsStore
+
+// CreatorsStore is the repository for creators
 type (
 	CreatorsStore interface {
 		GetAll(ctx context.Context, page, limit uint16) (shorts []*model.Creator, err error)

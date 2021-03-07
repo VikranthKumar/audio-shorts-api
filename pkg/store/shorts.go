@@ -11,13 +11,21 @@ import (
 )
 
 //go:generate mockgen -source=shorts.go -destination=shorts_mock.go -package=store AudioShortsStore
+
+// AudioShortsStore is the repository for audio shorts
 type (
 	AudioShortsStore interface {
+		// GetByID returns the entry corresponding to the given ID
 		GetByID(ctx context.Context, id string) (short *model.AudioShort, err error)
+		// GetAll returns the entries given the page and limit
 		GetAll(ctx context.Context, page, limit uint16) (shorts []*model.AudioShort, err error)
+		// Create inserts a new entry into the table
 		Create(ctx context.Context, input *model.AudioShortInput) (short *model.AudioShort, err error)
+		// Update updates the entry
 		Update(ctx context.Context, id string, input *model.AudioShortInput) (short *model.AudioShort, err error)
+		// Delete updates the status to 'deleted'
 		Delete(ctx context.Context, id string) (short *model.AudioShort, err error)
+		// HardDelete removes the entry completely
 		HardDelete(ctx context.Context, id string) (short *model.AudioShort, err error)
 	}
 

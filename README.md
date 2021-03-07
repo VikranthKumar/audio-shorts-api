@@ -1,7 +1,8 @@
 # Audio Shorts API
 
 A simple GraphQL Audio Shorts API to perform simple CRUD of audio shorts, built to showcase a backend service written in Go 
-which serves data from a PostgreSQL database. 
+which serves data from a PostgreSQL database. The entrypoint (`main.go`) is located in `cmd` and business logic are all located 
+in `pkg`. Migration files are in `migrations`.
 
 Postman Docs [here](api.postman_collection.json)
 
@@ -17,12 +18,13 @@ that refers to the `id` primary key field of `creators`.
 4. Pagination of audio shorts retrieval, by specifying `page` and `limit` in queries - page must be > 0 i.e. starts from 1.
 5. Unit tests in Go, integration tests using Postman.
 6. Libraries used: `gqlgen` for GraphQL, `golang-migrate` for migrations. No ORM for SQL, although did consider to use `GORM` or 
-`SQLBoiler`
-7. `Update` is a simple update, means all values must be specified in the mutation (no partial updates).
+`SQLBoiler`.
+7. Migrations are done in the Go script for simplicity.
+8. `Update` is a simple update, means all values must be specified in the mutation (no partial updates).
 
 ### Local Deployment
 
-The service uses Docker to host the Go backend and the PostgreSQL database. The config can be found in the .env file.
+The service uses Docker to host the Go backend and the PostgreSQL database. The config can be found in the [.env file](.env).
 
 To start, run:
 ````

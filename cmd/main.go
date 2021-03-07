@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/golang-migrate/migrate/v4"
 	"net/http"
 
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -35,9 +36,10 @@ func main() {
 	util.ExitOnErr(ctx, err)
 	defer m.Close()
 
+	// up migrations are done here; exit on failed migrations
 	go func() {
 		err := m.Up()
-		if err != nil {
+		if err != nil && err != migrate.ErrNoChange { // ignore ErrNoChange, meaning it is at the latest version
 			m.GracefulStop <- true
 			util.ExitOnErr(ctx, err)
 		}

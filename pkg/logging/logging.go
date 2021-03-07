@@ -11,12 +11,14 @@ const (
 
 var logger *zap.Logger
 
+// initLogger creates the context
 func initLogger() {
 	cfg := zap.NewDevelopmentConfig()
 	cfg.DisableStacktrace = true
 	logger, _ = cfg.Build()
 }
 
+// NewContext provides a context with logger
 func NewContext(ctx context.Context, fields ...zap.Field) context.Context {
 	if logger == nil {
 		initLogger()
@@ -24,6 +26,7 @@ func NewContext(ctx context.Context, fields ...zap.Field) context.Context {
 	return context.WithValue(ctx, LoggerKey, WithContext(ctx).With(fields...))
 }
 
+// WithContext provides a logger from the context
 func WithContext(ctx context.Context) *zap.Logger {
 	if ctx == nil {
 		return logger
